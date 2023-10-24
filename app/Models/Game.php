@@ -1,15 +1,17 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Game extends Model
 {
+    use HasFactory;
     protected $table = 'games';
 
     protected $fillable = [
-        'player_id',
+        'user_id',
         'dice1',
         'dice2',
         'result',
@@ -18,5 +20,6 @@ class Game extends Model
     {
         return $this->belongsTo(User::class);
     }
-    
 }
+
+

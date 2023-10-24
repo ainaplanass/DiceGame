@@ -17,24 +17,24 @@ class UserController extends Controller
   }
   public function createPlayer(Request $request)
  {
-    $validator = Validator::make($request->all(), [
-      'nickname' => 'nullable|string|max:255|unique:users',
-      'email' => 'required|string|email|max:255|unique:users',
-      'password' => 'required|string|min:6',
-  ]);
+      $validator = Validator::make($request->all(), [
+        'nickname' => 'nullable|string|max:255|unique:users',
+        'email' => 'required|string|email|max:255|unique:users',
+        'password' => 'required|string|min:6',
+    ]);
 
 
-    if ($validator->fails()) {
-        return response()->json(['errors' => $validator->errors()], 400);
-    }
+      if ($validator->fails()) {
+          return response()->json(['errors' => $validator->errors()], 400);
+      }
 
-    $user = User::create([
-      'nickname' => $request->has('nickname') ? $request->nickname : 'anonymus',
-      'email' => $request->email,
-      'password' => Hash::make($request->password),
-  ]); 
+      $user = User::create([
+        'nickname' => $request->has('nickname') ? $request->nickname : 'anonymus',
+        'email' => $request->email,
+        'password' => Hash::make($request->password),
+      ]); 
 
-    return response()->json(['message' => 'Usuario registrado con éxito'], 201);
+      return response()->json(['message' => 'Usuario registrado con éxito'], 201);
   }
 
   public function login(Request $request)
@@ -57,34 +57,135 @@ class UserController extends Controller
       }
 
       return response()->json(['error' => 'Credenciales inválidas'], 401);
+    }
+    public function editPlayer(Request $request, $id) {
+      $user = User::find($id);
+
+      if (!$user) {
+          return response()->json(['message' => 'Jugador no encontrado'], 404);
+      }
+
+      $user->nickname = $request->input('nickname');
+      $user->save();
+
+      return response()->json(['message' => 'Nombre de jugador editado con éxito'], 200);
+    }
+
+    public function playersWinrate()
+  {
+      $players = User::all();
+
+      $playersWithWinrate = $players->map(function ($player) {
+          $totalGames = $player->games->count();
+          $totalWins = $player->games->where('result', 7)->count();
+
+          if ($totalGames > 0) {
+              $winRate = ($totalWins / $totalGames) * 100;
+          } else {
+              $winRate = 0;
+          }
+
+          return [
+              'nickname' => $player->nickname,
+              'winrate' => $winRate,
+          ];
+      });
+
+    return response()->json(['players' => $playersWithWinrate], 200);
   }
-  public function editPlayer(Request $request, $id) {
-    $user = User::find($id);
-
-    if (!$user) {
-        return response()->json(['message' => 'Jugador no encontrado'], 404);
-    }
-
-    $user->nickname = $request->input('nickname');
-    $user->save();
-
-    return response()->json(['message' => 'Nombre de jugador editado con éxito'], 200);
-  }
-
-    public function playerWinrate()
+    public function playersList($id)
     {
+      $player = User::find($id);
+      $games = $player->games->map(function ($game) {
+        return [
+            'dice1' => $game->dice1,
+            'dice2' => $game->dice2,
+            'result' => $game->result,
+        ];
+    });
+  
+      return response()->json(['games'=>$games], 200);
 
     }
-    public function playersList()
+    public function playersRanking()
     {
-
+        $players = User::all();
+    
+        $totalGames = 0;
+        $totalWins = 0;
+    
+        foreach ($players as $player) {
+            $totalGames += $player->games->count();
+            $totalWins += $player->games->where('result', 7)->count();
+        }
+    
+        if ($totalGames > 0) {
+            $winrate = ($totalWins / $totalGames) * 100;
+        } else {
+            $winrate = 0;
+        }
+    
+        return response()->json(['Winrate general' => $winrate], 200);
     }
+    
     public function worstPlayers()
     {
-  
+        $players = User::all();
+    
+        $worstPlayer = null;
+        $lowestWinrate = 100; 
+    
+        foreach ($players as $player) {
+            $totalGames = $player->games->count();
+            $totalWins = $player->games->where('result', 7)->count();
+    
+            if ($totalGames > 0) {
+                $winrate = ($totalWins / $totalGames) * 100;
+            } else {
+                $winrate = 0;
+            }
+    
+            if ($winrate < $lowestWinrate) {
+                $lowestWinrate = $winrate;
+                $worstPlayer = $player;
+            }
+        }
+
+        return [
+          'Worst Player' => $worstPlayer->nickname,
+          'Worst Winrate' => $lowestWinrate,
+    ];
+    
     }
+    
     public function bestPlayers()
     {
+  
+      $players = User::all();
+    
+      $bestPlayer = null;
+      $bestWinrate = 0; 
+  
+      foreach ($players as $player) {
+          $totalGames = $player->games->count();
+          $totalWins = $player->games->where('result', 7)->count();
+  
+          if ($totalGames > 0) {
+              $winrate = ($totalWins / $totalGames) * 100;
+          } else {
+              $winrate = 0;
+          }
+  
+          if ($winrate > $bestWinrate) {
+              $bestWinrate = $winrate;
+              $bestPlayer = $player;
+          }
+      }
+
+      return [
+        'Worst Player' => $bestPlayer->nickname,
+        'Worst Winrate' => $bestWinrate,
+  ];
   
     }
   }
