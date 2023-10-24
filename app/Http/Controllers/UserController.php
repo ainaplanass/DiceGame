@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Passport\Passport;
+use Illuminate\Validation\Rules\Password;
 
 class UserController extends Controller
 {
@@ -20,7 +21,8 @@ class UserController extends Controller
       $validator = Validator::make($request->all(), [
         'nickname' => 'nullable|string|max:255|unique:users',
         'email' => 'required|string|email|max:255|unique:users',
-        'password' => 'required|string|min:6',
+        'password' => ['required', Password::min(8)->mixedCase()->numbers()->symbols()->uncompromised()],
+      
     ]);
 
 
