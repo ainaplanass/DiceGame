@@ -29,12 +29,12 @@ class UserController extends Controller
       }
 
       $user = User::create([
-        'nickname' => $request->has('nickname') ? $request->nickname : 'anonymus',
+        'nickname' => $request->has('nickname') ? $request->nickname : 'Anònim',
         'email' => $request->email,
         'password' => Hash::make($request->password),
       ]); 
 
-      return response()->json(['message' => 'Usuario registrado con éxito'], 201);
+      return response()->json(['message' => 'Usuari registrat amb èxit'], 201);
   }
 
   public function login(Request $request)
@@ -56,19 +56,19 @@ class UserController extends Controller
         return response()->json(['access_token' => $token], 200);
       }
 
-      return response()->json(['error' => 'Credenciales inválidas'], 401);
+      return response()->json(['error' => 'Credencials invàlides'], 401);
     }
     public function editPlayer(Request $request, $id) {
       $user = User::find($id);
 
       if (!$user) {
-          return response()->json(['message' => 'Jugador no encontrado'], 404);
+          return response()->json(['message' => 'Jugador no trobat'], 404);
       }
 
       $user->nickname = $request->input('nickname');
       $user->save();
 
-      return response()->json(['message' => 'Nombre de jugador editado con éxito'], 200);
+      return response()->json(['message' => 'Nom del jugador editat'], 200);
     }
 
     public function playersWinrate()
