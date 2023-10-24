@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Game;
 use Illuminate\Support\Facades\Validator;
 use App\Models\User;
+use App\Models\Role;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Passport\Passport;
 use Illuminate\Validation\Rules\Password;
@@ -35,6 +36,7 @@ class UserController extends Controller
         'email' => $request->email,
         'password' => Hash::make($request->password),
       ]); 
+      $user->assignRole('player');
 
       return response()->json(['message' => 'Usuari registrat amb èxit'], 201);
   }
