@@ -76,7 +76,7 @@ class UserController extends Controller
     }
 
     public function playersWinrate()
-  {
+   {
       $players = User::all();
 
       $playersWithWinrate = $players->map(function ($player) {
@@ -96,7 +96,7 @@ class UserController extends Controller
       });
 
     return response()->json(['players' => $playersWithWinrate], 200);
-  }
+   }
     public function playersList($id)
     {
       $player = User::find($id);
@@ -106,7 +106,7 @@ class UserController extends Controller
             'dice2' => $game->dice2,
             'result' => $game->result,
         ];
-    });
+        });
   
       return response()->json(['games'=>$games], 200);
 
@@ -154,11 +154,10 @@ class UserController extends Controller
                 $worstPlayer = $player;
             }
         }
-
         return [
           'Worst Player' => $worstPlayer->nickname,
           'Worst Winrate' => $lowestWinrate,
-    ];
+         ];
     
     }
     
@@ -189,7 +188,7 @@ class UserController extends Controller
       return [
         'Worst Player' => $bestPlayer->nickname,
         'Worst Winrate' => $bestWinrate,
-  ];
+        ];
   
     }
   }
