@@ -9,6 +9,18 @@ use App\Models\User;
 class RegistrerControllerTest extends TestCase
 {
     use withFaker;
+
+    private $user;
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->user = User::factory()->create([
+            'nickname'=>'bixito',
+            'email' => 'tbixibiciest@example.com',
+            'password' => bcrypt('password123.'),
+        ]);
+    }
     public function testCreatePlayer()
     {  
         $userData = [
@@ -49,12 +61,11 @@ class RegistrerControllerTest extends TestCase
         $response->assertStatus(400)
             ->assertJsonValidationErrors(['password']);
     }
-    public function testExistinMail()
+    public function testExistigMail()
     {
-        $user = User::factory()->create();
         $userData = [
             'nickname'=> 'xuxuru',
-            'email' => $user->email,
+            'email' => $this->user->email,
             'password' => 'ValidPassword123.',
         ];
 
@@ -63,11 +74,10 @@ class RegistrerControllerTest extends TestCase
         $response->assertStatus(400)
             ->assertJsonValidationErrors(['email']);
     }
-    public function testExistinNickname()
+    public function testExistingNickname()
     {
-        $user = User::factory()->create();
         $userData = [
-            'nickname'=> $user->nickname,
+            'nickname'=> $this->user->nickname,
             'email' => $this->faker->unique()->safeEmail,
             'password' => 'ValidPassword123.',
         ];
@@ -81,5 +91,11 @@ class RegistrerControllerTest extends TestCase
     protected function createPlayerRequest($data)
     {
         return $this->postJson('/api/players', $data);
+    }
+    public function tearDown(): void
+    {
+        $this->user->delete();
+
+        parent::tearDown();
     }
 }

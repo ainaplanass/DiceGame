@@ -11,29 +11,44 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\GameController;
 class GameControllerTest extends TestCase
 {
-    
-    public function testThrowDice()
-    {
-        $user = User::factory()->create();
-        $controller = new GameController();
-        $response = $controller->throwDice($user->id);
 
-        $this->assertEquals(201, $response->getStatusCode());
+  private $user;
 
-        $this->assertDatabaseHas('games', [
-            'user_id' => $user->id,
-        ]);
-    }
+
+  public function setUp(): void
+  {
+      parent::setUp();
+
+      $this->user = User::factory()->create([
+          'nickname'=>'bixito',
+          'email' => 'tbixibiciest@example.com',
+          'password' => bcrypt('password123.'),
+      ]);
+      
+  }
+     public function testThrowDice()
+     {
+         $response = $this->json('POST', "/api/players/{$this->user->id}/games", []);
+
+         $this->assertEquals(201, $response->getStatusCode());
+
+         $this->assertDatabaseHas('games', [
+             'user_id' => $this->user->id,
+         ]);
+     }
       public function testDeleteGame()
-      {
-        $user = User::factory()->create();
-        $game1 = Game::factory()->create(['user_id' => $user->id]);
-        $game2 = Game::factory()->create(['user_id' => $user->id]);
-        $controller = new GameController(); 
-    
-        $response = $controller->deleteGame($user->id);
-    
+      {            
+        $game1 = Game::factory()->create(['user_id' => $this->user->id]);
+        $game2 = Game::factory()->create(['user_id' => $this->user->id]);
+        $response = $this->json('delete', "/api/players/{$this->user->id}/games", []);
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertDatabaseMissing('games', ['user_id' => $user->id]);
+        $this->assertDatabaseMissing('games', ['user_id' => $this->user->id]);
       }
+
+      public function tearDown(): void
+    {
+        $this->user->delete();
+
+        parent::tearDown();
+    }
 }

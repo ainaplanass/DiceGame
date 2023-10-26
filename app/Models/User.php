@@ -50,8 +50,5 @@ class User extends Authenticatable
     {
         return $this->hasMany(Game::class, 'user_id');
     }
-    public function role()
-    {
-        return $this->hasOne(Role::class, 'name', 'role');
-    }
+   
 }

@@ -13,10 +13,7 @@ use Illuminate\Validation\Rules\Password;
 
 class UserController extends Controller
 {
-  public function index()
-  {
-      return view ('holaaaa');
-  }
+
   public function createPlayer(Request $request)
  {
       $validator = Validator::make($request->all(), [
@@ -68,7 +65,9 @@ class UserController extends Controller
       if (!$user) {
           return response()->json(['message' => 'Jugador no trobat'], 404);
       }
-
+      $request->validate([
+        'nickname' => 'nullable|string|max:255|unique:users,nickname,'
+    ]);
       $user->nickname = $request->input('nickname');
       $user->save();
 
@@ -79,6 +78,9 @@ class UserController extends Controller
    {
       $players = User::all();
 
+      if ($players->isEmpty()) {
+        return response()->json(['message' => 'No hi ha jugadors'], 404);
+    }
       $playersWithWinrate = $players->map(function ($player) {
           $totalGames = $player->games->count();
           $totalWins = $player->games->where('result', 7)->count();
@@ -100,6 +102,10 @@ class UserController extends Controller
     public function playersList($id)
     {
       $player = User::find($id);
+
+      if (!$player) {
+        return response()->json(['message' => 'Jugador no trobat'], 404);
+    }
       $games = $player->games->map(function ($game) {
         return [
             'dice1' => $game->dice1,
@@ -114,7 +120,11 @@ class UserController extends Controller
     public function playersRanking()
     {
         $players = User::all();
-    
+        
+        if ($players->isEmpty()) {
+            return response()->json(['message' => 'No hi ha jugadors'], 404);
+        }
+        
         $totalGames = 0;
         $totalWins = 0;
     
@@ -135,6 +145,10 @@ class UserController extends Controller
     public function worstPlayers()
     {
         $players = User::all();
+
+        if ($players->isEmpty()) {
+            return response()->json(['message' => 'No hi ha jugadors'], 404);
+        }
     
         $worstPlayer = null;
         $lowestWinrate = 100; 
@@ -166,6 +180,10 @@ class UserController extends Controller
   
       $players = User::all();
     
+      if ($players->isEmpty()) {
+        return response()->json(['message' => 'No hi ha jugadors'], 404);
+    }
+
       $bestPlayer = null;
       $bestWinrate = 0; 
   
