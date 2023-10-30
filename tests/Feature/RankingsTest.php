@@ -7,10 +7,11 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use App\Models\User;
 use App\Models\Game;
-class RankingsControllerTest extends TestCase
+class RankingsTest extends TestCase
 {   
     protected $createdPlayerIds = [];
     private $players;
+    private $game;
     public function setUp(): void
     {
         parent::setUp();
@@ -44,10 +45,21 @@ class RankingsControllerTest extends TestCase
         $this->assertArrayHasKey('games', $responseData);
         $this->assertIsArray($responseData['games']);
     }
-
+    
+    public function testUserInvalidWinrate()
+    {
+        $response =  $this->json('get', "/api/players/{900}/games", []);
+        $response->assertStatus(404);
+    }
+    public function testPlayersRanking()
+    {
+        $response =  $this->json('get', "api/players/ranking", []);
+        $response->assertStatus(200);
+        $this->assertEquals(100, $response['Winrate general']);
+    }
     public function tearDown():void
     {
         User::whereIn('id', $this->createdPlayerIds)->delete();
         Game::whereIn('user_id', $this->createdPlayerIds)->delete();
         parent::tearDown();
-    }}
+    }};

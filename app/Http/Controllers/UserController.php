@@ -124,7 +124,7 @@ class UserController extends Controller
         if ($players->isEmpty()) {
             return response()->json(['message' => 'No hi ha jugadors'], 404);
         }
-        
+
         $totalGames = 0;
         $totalWins = 0;
     
@@ -142,49 +142,54 @@ class UserController extends Controller
         return response()->json(['Winrate general' => $winrate], 200);
     }
     
-    public function worstPlayers()
+    public function worstPlayer()
     {
         $players = User::all();
 
-        if ($players->isEmpty()) {
-            return response()->json(['message' => 'No hi ha jugadors'], 404);
-        }
-    
-        $worstPlayer = null;
-        $lowestWinrate = 100; 
-    
-        foreach ($players as $player) {
-            $totalGames = $player->games->count();
-            $totalWins = $player->games->where('result', 7)->count();
-    
-            if ($totalGames > 0) {
-                $winrate = ($totalWins / $totalGames) * 100;
-            } else {
-                $winrate = 0;
-            }
-    
-            if ($winrate < $lowestWinrate) {
-                $lowestWinrate = $winrate;
-                $worstPlayer = $player;
-            }
-        }
-        return [
-          'Worst Player' => $worstPlayer->nickname,
-          'Worst Winrate' => $lowestWinrate,
-         ];
-    
+    if ($players->isEmpty()) {
+        return response()->json(['message' => 'No hi ha jugadors'], 404);
     }
+
+    $worstPlayers = [];
+    $lowestWinrate = 100;
+
+    foreach ($players as $player) {
+        $totalGames = $player->games->count();
+        $totalWins = $player->games->where('result', 7)->count();
+
+        if ($totalGames > 0) {
+            $winrate = ($totalWins / $totalGames) * 100;
+        } else {
+            $winrate = 0;
+        }
+
+        if ($winrate < $lowestWinrate) {
+            $worstPlayers = [$player];
+            $lowestWinrate = $winrate;
+        } elseif ($winrate == $lowestWinrate) {
+            $worstPlayers[] = $player;
+        }
+    }
+
+    $worstPlayerNicknames = collect($worstPlayers)->pluck('nickname')->all();
+    if ($worstPlayerNicknames == NULL) {
+        return response()->json(['message' => 'No hi ha jugadors'], 404);
+    }
+    return [
+        'Worst Player' => $worstPlayerNicknames,
+        'Worst Winrate' => $lowestWinrate,
+    ];
+}
     
-    public function bestPlayers()
+    public function bestPlayer()
     {
-  
       $players = User::all();
     
       if ($players->isEmpty()) {
         return response()->json(['message' => 'No hi ha jugadors'], 404);
     }
 
-      $bestPlayer = null;
+      $bestPlayers = [];
       $bestWinrate = 0; 
   
       foreach ($players as $player) {
@@ -198,14 +203,22 @@ class UserController extends Controller
           }
   
           if ($winrate > $bestWinrate) {
+              $bestPlayers = [$player];
               $bestWinrate = $winrate;
-              $bestPlayer = $player;
           }
+          elseif ($winrate == $bestWinrate) {
+            $bestPlayers[] = $player;
+        }
       }
+      $bestPlayersNicknames = collect($bestPlayers)->pluck('nickname')->all();
+      
+      if ($bestPlayersNicknames == NULL) {
+        return response()->json(['message' => 'No hi ha jugadors'], 404);
+    }
 
       return [
-        'Worst Player' => $bestPlayer->nickname,
-        'Worst Winrate' => $bestWinrate,
+        'Best Player' =>$bestPlayersNicknames,
+        'Best Winrate' => $bestWinrate,
         ];
   
     }

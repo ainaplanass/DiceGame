@@ -31,7 +31,7 @@ class GameController extends Controller
 
         $game->save();
 
-        return response()->json(['message' => 'Tirada registrada con éxito'], 201);
+        return response()->json(['message' => 'Tirada registrada amb éxit'], 201);
     }
     public function deleteGame($id)
     {
@@ -42,7 +42,7 @@ class GameController extends Controller
 
         $user->games()->delete();
         
-        return response()->json(['message' => 'Tiradas del jugador eliminadas con éxito'], 200);
+        return response()->json(['message' => 'Tirades del jugador eliminades amb éxit'], 200);
 
     }
 
