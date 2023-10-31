@@ -85,11 +85,6 @@ class UserController extends Controller
 
       return response()->json(['message' => 'Nom del jugador editat'], 200);
     }
-    public function logout(Request $request)
-    {
-        auth()->logout(); 
-        return response()->json(['message' => 'Sessió tancada'], 200);
-    }
     public function playersWinrate()
    {
       $players = User::all();
