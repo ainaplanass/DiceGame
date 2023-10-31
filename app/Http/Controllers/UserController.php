@@ -10,7 +10,7 @@ use App\Models\Role;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Passport\Passport;
 use Illuminate\Validation\Rules\Password;
-
+use Illuminate\Support\Facades\Auth;
 class UserController extends Controller
 {
 
@@ -39,25 +39,37 @@ class UserController extends Controller
   }
 
   public function login(Request $request)
-  {
-      $validator = Validator::make($request->all(), [
-          'email' => 'required|string|email',
-          'password' => 'required|string',
-      ]);
+{
+    $validator = Validator::make($request->all(), [
+        'email' => 'required|string|email',
+        'password' => 'required|string',
+    ]);
 
-      if ($validator->fails()) {
-          return response()->json(['error' => $validator->errors()], 400);
-      }
+    if ($validator->fails()) {
+        return response()->json(['error' => $validator->errors()], 400);
+    }
 
-      $credentials = $request->only(['email', 'password']);
+    if (auth()->attempt(['email' => $request->email, 'password' => $request->password])) {
+        $user = auth()->user();
 
-      if (auth()->attempt($credentials)) {
-      $user = auth()->user();
         $token = $user->createToken('MyAppToken')->accessToken;
-        return response()->json(['access_token' => $token], 200);
-      }
 
-      return response()->json(['error' => 'Credencials invàlides'], 401);
+        return response()->json(['access_token' => $token->token, 'message' => 'Sessió oberta'], 200);
+    }
+
+    return response()->json(['error' => 'Correu o contrassenya incorrecte'], 401);
+}
+
+    public function logout(Request $request)
+    {
+        if (Auth::check()) {
+            Auth::user()->tokens->each(function ($token, $key) {
+                $token->delete();
+            });
+            return response()->json(['message' => 'sessió tancada']);
+        } else {
+            return response()->json(['message' => 'no has iniciat sessió'], 401);
+        }
     }
     public function editPlayer(Request $request, $id) {
       $user = User::find($id);
