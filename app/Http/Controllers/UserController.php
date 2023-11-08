@@ -20,7 +20,7 @@ class UserController extends Controller
         'nickname' => 'nullable|string|max:255|unique:users',
         'email' => 'required|string|email|max:255|unique:users',
         'password' => ['required', Password::min(8)->mixedCase()->numbers()->symbols()->uncompromised()],
-      
+
     ]);
 
 
@@ -32,7 +32,7 @@ class UserController extends Controller
         'nickname' => $request->has('nickname') ? $request->nickname : 'Anònim',
         'email' => $request->email,
         'password' => Hash::make($request->password),
-      ]); 
+      ]);
       $user->assignRole('player');
 
       return response()->json(['message' => 'Usuari registrat amb èxit'], 201);
@@ -49,15 +49,14 @@ class UserController extends Controller
         return response()->json(['error' => $validator->errors()], 400);
     }
 
-    if (auth()->attempt(['email' => $request->email, 'password' => $request->password])) {
-        $user = auth()->user();
+    $user = User::where('email', $request->email)->first();
 
-        $token = $user->createToken('MyAppToken')->accessToken;
-
-        return response()->json(['access_token' => $token->token, 'message' => 'Sessió oberta'], 200);
+    if (!$user || !Hash::check($request->password, $user->password)) {
+        return response()->json(['error' => 'Correu o contrassenya incorrecte'], 401);
     }
 
-    return response()->json(['error' => 'Correu o contrassenya incorrecte'], 401);
+    $token = $user->createToken('MyAppToken')->accessToken;
+    return response()->json(['access_token' => $token, 'message' => 'Sessió oberta'], 200);
 }
 
     public function logout(Request $request)
@@ -72,6 +71,11 @@ class UserController extends Controller
         }
     }
     public function editPlayer(Request $request, $id) {
+        $authenticatedUser = Auth::user();
+
+        if ($authenticatedUser->id != $id) {
+            return response()->json(['message' => 'No tienes permiso para editar este jugador'], 403);
+        }
       $user = User::find($id);
 
       if (!$user) {
@@ -124,35 +128,35 @@ class UserController extends Controller
             'result' => $game->result,
         ];
         });
-  
+
       return response()->json(['games'=>$games], 200);
 
     }
     public function playersRanking()
     {
         $players = User::all();
-        
+
         if ($players->isEmpty()) {
             return response()->json(['message' => 'No hi ha jugadors'], 404);
         }
 
         $totalGames = 0;
         $totalWins = 0;
-    
+
         foreach ($players as $player) {
             $totalGames += $player->games->count();
             $totalWins += $player->games->where('result', 7)->count();
         }
-    
+
         if ($totalGames > 0) {
             $winrate = ($totalWins / $totalGames) * 100;
         } else {
             $winrate = 0;
         }
-    
+
         return response()->json(['Winrate general' => $winrate], 200);
     }
-    
+
     public function worstPlayer()
     {
         $players = User::all();
@@ -191,28 +195,28 @@ class UserController extends Controller
         'Worst Winrate' => $lowestWinrate,
     ];
 }
-    
+
     public function bestPlayer()
     {
       $players = User::all();
-    
+
       if ($players->isEmpty()) {
         return response()->json(['message' => 'No hi ha jugadors'], 404);
     }
 
       $bestPlayers = [];
-      $bestWinrate = 0; 
-  
+      $bestWinrate = 0;
+
       foreach ($players as $player) {
           $totalGames = $player->games->count();
           $totalWins = $player->games->where('result', 7)->count();
-  
+
           if ($totalGames > 0) {
               $winrate = ($totalWins / $totalGames) * 100;
           } else {
               $winrate = 0;
           }
-  
+
           if ($winrate > $bestWinrate) {
               $bestPlayers = [$player];
               $bestWinrate = $winrate;
@@ -222,7 +226,7 @@ class UserController extends Controller
         }
       }
       $bestPlayersNicknames = collect($bestPlayers)->pluck('nickname')->all();
-      
+
       if ($bestPlayersNicknames == NULL) {
         return response()->json(['message' => 'No hi ha jugadors'], 404);
     }
@@ -231,6 +235,6 @@ class UserController extends Controller
         'Best Player' =>$bestPlayersNicknames,
         'Best Winrate' => $bestWinrate,
         ];
-  
+
     }
   }
