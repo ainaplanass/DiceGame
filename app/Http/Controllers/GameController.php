@@ -19,11 +19,11 @@ class GameController extends Controller
         }
         if (auth()->check()) {
             $authenticatedUser = auth()->user();
-            
+
             if ($authenticatedUser->id !== $user->id) {
                 return response()->json(['error' => 'Només pots fer jugades amb el teu id.'], 403);
             }
-        } 
+        }
         $dice1 = random_int(1, 6);
         $dice2 = random_int(1, 6);
 
@@ -33,7 +33,7 @@ class GameController extends Controller
             'dice1' => $dice1,
             'dice2' => $dice2,
             'result' => $total,
-            'user_id' => $user->id, 
+            'user_id' => $user->id,
         ]);
 
         $game->save();
@@ -46,9 +46,15 @@ class GameController extends Controller
         if (!$user) {
             return response()->json(['message' => 'Jugador no trobat'], 404);
         }
+        if (auth()->check()) {
+            $authenticatedUser = auth()->user();
 
+            if ($authenticatedUser->id !== $user->id) {
+                return response()->json(['error' => 'Només pots eliminar les teves jugades..'], 403);
+            }
+        }
         $user->games()->delete();
-        
+
         return response()->json(['message' => 'Tirades del jugador eliminades amb éxit'], 200);
 
     }

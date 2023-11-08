@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Hash;
 use Laravel\Passport\Passport;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Support\Facades\Auth;
+use Spatie\Permission\Traits\HasRoles;
+
 class UserController extends Controller
 {
 
@@ -64,10 +66,10 @@ class UserController extends Controller
         if (Auth::check()) {
             Auth::user()->tokens->each(function ($token, $key) {
                 $token->delete();
+
             });
-            return response()->json(['message' => 'sessió tancada']);
-        } else {
-            return response()->json(['message' => 'no has iniciat sessió'], 401);
+
+            return response()->json(['message' => 'sessió tancada' ]);
         }
     }
     public function editPlayer(Request $request, $id) {
@@ -120,6 +122,13 @@ class UserController extends Controller
 
       if (!$player) {
         return response()->json(['message' => 'Jugador no trobat'], 404);
+    }
+    if (auth()->check()) {
+        $authenticatedUser = auth()->user();
+
+        if ($authenticatedUser->id !== $player->id) {
+            return response()->json(['error' => 'Només pots mirar les teves jugades..'], 403);
+        }
     }
       $games = $player->games->map(function ($game) {
         return [

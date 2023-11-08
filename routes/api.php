@@ -8,8 +8,8 @@ use App\Http\Controllers\HomeController;
 
 Route::post('/players', [UserController::class, 'createPlayer']);
 Route::post('/login', [UserController::class, 'login']);
-Route::post('/logout', [UserController::class, 'logout']);
-   Route::middleware('auth:api')->group(function () {
+Route::middleware('auth:api')->group(function () {
+       Route::post('/logout', [UserController::class, 'logout']);
         Route::put('players/{id}', [UserController::class, 'editPlayer']);
         Route::post('players/{id}/games', [GameController::class, 'throwDice']);
         Route::delete('players/{id}/games', [GameController::class, 'deleteGame']);
