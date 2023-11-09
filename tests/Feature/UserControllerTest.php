@@ -10,7 +10,7 @@ use Illuminate\Validation\ValidationException;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 class UserControllerTest extends TestCase
-{ 
+{
     private $user;
     private $user2;
     private $authController;
@@ -43,29 +43,35 @@ class UserControllerTest extends TestCase
             'password' => 'invalidpassword',
         ]);
 
-    
+
         $this->assertEquals(401, $response->getStatusCode());
-    
+
         $responseContent = json_decode($response->getContent(), true);
         $this->assertArrayHasKey('error', $responseContent);
-        $this->assertEquals('Credencials invàlides', $responseContent['error']);
+        $this->assertEquals('Correu o contrassenya incorrectes', $responseContent['error']);
     }
      public function testEditPlayerSuccess()
      {
-         $response= $this->json('PUT', "/api/players/{$this->user->id}",
+        $token = $this->user->createToken('TestToken')->accessToken;
+
+        $response = $this->withHeaders(['Authorization' => 'Bearer ' . $token])->json('PUT', "/api/players/{$this->user->id}",
          ['nickname' => 'guapaxula.']);
          $this->assertEquals(200, $response->getStatusCode());
      }
      public function testEditPlayerNoUser()
      {
-         $response= $this->json('PUT', "/api/players/{90}",
+        $token = $this->user->createToken('TestToken')->accessToken;
+
+        $response = $this->withHeaders(['Authorization' => 'Bearer ' . $token])->json('PUT', "/api/players/{90}",
          ['nickname' => 'keeee.']);
          $this->assertEquals(404, $response->getStatusCode());
      }
-    
+
      public function testEditPlayerRepeatNickname()
      {
-         $response= $this->json('PUT', "/api/players/{$this->user2->id}",
+        $token = $this->user->createToken('TestToken')->accessToken;
+
+        $response = $this->withHeaders(['Authorization' => 'Bearer ' . $token])->json('PUT', "/api/players/{$this->user->id}",
          ['nickname' => 'bixito']);
          $this->assertEquals(422, $response->getStatusCode());
      }

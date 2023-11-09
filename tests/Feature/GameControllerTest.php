@@ -24,11 +24,13 @@ class GameControllerTest extends TestCase
           'email' => 'tbixibiciest@example.com',
           'password' => bcrypt('password123.'),
       ]);
-      
+
   }
      public function testThrowDice()
      {
-         $response = $this->json('POST', "/api/players/{$this->user->id}/games", []);
+        $token = $this->user->createToken('TestToken')->accessToken;
+
+        $response = $this->withHeaders(['Authorization' => 'Bearer ' . $token])->json('POST', "/api/players/{$this->user->id}/games", []);
 
          $this->assertEquals(201, $response->getStatusCode());
 
@@ -37,10 +39,11 @@ class GameControllerTest extends TestCase
          ]);
      }
       public function testDeleteGame()
-      {            
+      {
         $game1 = Game::factory()->create(['user_id' => $this->user->id]);
         $game2 = Game::factory()->create(['user_id' => $this->user->id]);
-        $response = $this->json('delete', "/api/players/{$this->user->id}/games", []);
+        $token = $this->user->createToken('TestToken')->accessToken;
+        $response = $this->withHeaders(['Authorization' => 'Bearer ' . $token])->json('delete', "/api/players/{$this->user->id}/games", []);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertDatabaseMissing('games', ['user_id' => $this->user->id]);
       }

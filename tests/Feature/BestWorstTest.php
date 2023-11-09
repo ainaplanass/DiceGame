@@ -8,7 +8,7 @@ use Tests\TestCase;
 use App\Models\User;
 use App\Models\Game;
 class BestWorstTest extends TestCase
-{   
+{
     protected $createdPlayerIds = [];
     private $players;
     private $game;
@@ -19,7 +19,7 @@ class BestWorstTest extends TestCase
        $this->players = User::factory()->count(3)->create();
 
        $this->createdPlayerIds = $this->players->pluck('id')->toArray();
-        
+
        Game::factory()->create(['user_id' => $this->players[0],'result' => 2,]);
        Game::factory()->create(['user_id' => $this->players[2],'result' => 2,]);
        Game::factory()->create(['user_id' => $this->players[1],'result' => 7,]);
@@ -27,16 +27,20 @@ class BestWorstTest extends TestCase
     }
    public function testWorstPlayer(){
 
-       $response = $this->json('get', "api/players/ranking/loser", []);
-       $response->assertStatus(200);
+    $token = $this->players[0]->createToken('TestToken')->accessToken;
+
+    $response = $this->withHeaders(['Authorization' => 'Bearer ' . $token])->json('get', "api/players/ranking/worst", []);
+           $response->assertStatus(200);
        $response->assertJsonFragment([
            'Worst Player' => [$this->players[0]->nickname, $this->players[2]->nickname],
            'Worst Winrate' => 0,
        ]);
-   }
+    }
    public function testBestPlayer(){
 
-         $response = $this->json('get', "api/players/ranking/best", []);
+    $token = $this->players[0]->createToken('TestToken')->accessToken;
+
+    $response = $this->withHeaders(['Authorization' => 'Bearer ' . $token])->json('get', "api/players/ranking/best", []);
          $response->assertStatus(200);
          $response->assertJsonFragment([
              'Best Player' => [$this->players[1]->nickname],

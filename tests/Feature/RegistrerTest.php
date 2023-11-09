@@ -11,6 +11,7 @@ class RegistrerTest extends TestCase
     use withFaker;
 
     private $user;
+    private $userID;
     public function setUp(): void
     {
         parent::setUp();
@@ -22,7 +23,7 @@ class RegistrerTest extends TestCase
         ]);
     }
     public function testCreatePlayer()
-    {  
+    {
         $userData = [
             'nickname' => $this->faker->name(),
             'email' => $this->faker->unique()->safeEmail,
@@ -33,7 +34,9 @@ class RegistrerTest extends TestCase
 
         $response->assertStatus(201)
             ->assertJson(['message' => 'Usuari registrat amb èxit']);
-      
+
+        $this->userID = User::where('email', $userData['email'])->first()->id;
+
     }
     public function testInvalidEmail()
     {
@@ -94,6 +97,7 @@ class RegistrerTest extends TestCase
     }
     public function tearDown(): void
     {
+        User::destroy($this->userID);
         $this->user->delete();
 
         parent::tearDown();

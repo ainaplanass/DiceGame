@@ -54,7 +54,7 @@ class UserController extends Controller
     $user = User::where('email', $request->email)->first();
 
     if (!$user || !Hash::check($request->password, $user->password)) {
-        return response()->json(['error' => 'Correu o contrassenya incorrecte'], 401);
+        return response()->json(['error' => 'Correu o contrassenya incorrectes'], 401);
     }
 
     $token = $user->createToken('MyAppToken')->accessToken;
@@ -73,16 +73,19 @@ class UserController extends Controller
         }
     }
     public function editPlayer(Request $request, $id) {
+
+        $user = User::find($id);
+        if (!$user) {
+            return response()->json(['message' => 'Jugador no trobat'], 404);
+        }
         $authenticatedUser = Auth::user();
 
         if ($authenticatedUser->id != $id) {
-            return response()->json(['message' => 'No tienes permiso para editar este jugador'], 403);
+            return response()->json(['message' => 'No tens permisos per editar aquest jugador'], 403);
         }
-      $user = User::find($id);
 
-      if (!$user) {
-          return response()->json(['message' => 'Jugador no trobat'], 404);
-      }
+
+
       $request->validate([
         'nickname' => 'nullable|string|max:255|unique:users,nickname,'
     ]);
