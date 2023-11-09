@@ -17,8 +17,6 @@ class RoleSeeder extends Seeder
         Permission::create(['name' => 'playerswinrate']);
         Permission::create(['name' => 'playerslist']);
         Permission::create(['name' => 'playersranking']);
-        Permission::create(['name' => 'worstplayer']);
-        Permission::create(['name' => 'bestplayer']);
 
         $playerPermision = [
         'editplayer',
@@ -28,9 +26,9 @@ class RoleSeeder extends Seeder
 
         $role1 = Role::findByName('admin');
         $role2 = Role::findByName('player');
-        
+
         $role1->syncPermissions(Permission::all());
-        
+
         $role2->syncPermissions($playerPermision);
     }
 }

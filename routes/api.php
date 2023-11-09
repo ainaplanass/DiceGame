@@ -16,6 +16,6 @@ Route::middleware('auth:api')->group(function () {
         Route::get('players/{id}/games', [UserController::class, 'playersList']);
         Route::get('players', [UserController::class, 'playersWinrate'])->middleware('can:playerswinrate');
         Route::get('players/ranking', [UserController::class, 'playersRanking'])->middleware('can:playersranking');
-        Route::get('players/ranking/worst', [UserController::class, 'worstPlayer'])->middleware('can:worstplayer');
-        Route::get('players/ranking/best', [UserController::class, 'bestPlayer'])->middleware('can:bestplayer');
+        Route::get('players/ranking/worst', [UserController::class, 'worstPlayer']);
+        Route::get('players/ranking/best', [UserController::class, 'bestPlayer']);
     });
