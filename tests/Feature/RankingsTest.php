@@ -18,6 +18,10 @@ class RankingsTest extends TestCase
 
         $this->players = User::factory()->count(3)->create();
         $this->players[0]->assignRole('admin');
+        foreach ($this->players as $player) {
+            $player->assignRole('player');
+        }
+
 
         $this->createdPlayerIds = $this->players->pluck('id')->toArray();
 

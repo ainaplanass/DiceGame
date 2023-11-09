@@ -16,11 +16,11 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
         ]);
 
-        $user =  \App\Models\User::factory()->create([
-             'nickname' => 'Aina',
-             'email' => 'aina@example.com',
-             'password' => 'que',
-         ]);
-         $user->assignRole('admin');
+        // $user =  \App\Models\User::factory()->create([
+        //      'nickname' => 'Aina',
+        //      'email' => 'aina@example.com',
+        //      'password' => 'que',
+        //  ]);
+        //  $user->assignRole('admin');
     }
 }

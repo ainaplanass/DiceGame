@@ -17,6 +17,9 @@ class BestWorstTest extends TestCase
         parent::setUp();
 
        $this->players = User::factory()->count(3)->create();
+       foreach ($this->players as $player) {
+        $player->assignRole('player');
+        }
 
        $this->createdPlayerIds = $this->players->pluck('id')->toArray();
 

@@ -23,7 +23,9 @@ class UserControllerTest extends TestCase
             'email' => 'tbixibiciest@example.com',
             'password' => bcrypt('password123.'),
         ]);
+        $this->user->assignRole('player');
         $this->user2 = User::factory()->create();
+        $this->user2->assignRole('player');
     }
     public function testLoginOk()
     {

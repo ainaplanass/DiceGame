@@ -21,6 +21,7 @@ class RegistrerTest extends TestCase
             'email' => 'tbixibiciest@example.com',
             'password' => bcrypt('password123.'),
         ]);
+        $this->user->assignRole('player');
     }
     public function testCreatePlayer()
     {
