@@ -22,4 +22,3 @@ In this game the player rolls two dice, if they sum 7 he wins, otherwise loses.
 - **Laravel**: This project is developed using Laravel framework.
 - **Passport**: Access to APIs is protected by token-based credentials.
 - **Spatie**: User permissions and roles (admin/player)
-- 
