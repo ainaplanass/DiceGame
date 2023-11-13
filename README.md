@@ -18,7 +18,7 @@ In this game the player rolls two dice, if they sum 7 he wins, otherwise loses.
 - 
 ## Technology 
 
-- **PHP**: This 4project is developed using PHP.
+- **PHP**: This project is developed using PHP.
 - **Laravel**: This project is developed using Laravel framework.
 - **Passport**: Access to APIs is protected by token-based credentials.
 - **Spatie**: User permissions and roles (admin/player)
