@@ -1,4 +1,4 @@
-![dce](https://github.com/ainaplanass/DiceGame/assets/82839054/fd5e795c-8085-40d0-934f-0948d9a02274 | width=50)
+<img src="(https://github.com/ainaplanass/DiceGame/assets/82839054/fd5e795c-8085-40d0-934f-0948d9a02274" width="48">
 
 # Dice Game Api
 
