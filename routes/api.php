@@ -14,7 +14,7 @@ Route::middleware('auth:api')->group(function () {
         Route::post('players/{id}/games', [GameController::class, 'throwDice'])->middleware('role:admin|player');
         Route::delete('players/{id}/games', [GameController::class, 'deleteGame'])->middleware('role:admin|player');
         Route::get('players/{id}/games', [UserController::class, 'playersList'])->middleware('role:admin|player');
-        Route::get('players', [UserController::class, 'players'])->middleware('role:admin');
+        Route::get('players', [UserController::class, 'playersWinrate'])->middleware('role:admin');
         Route::get('players/ranking', [UserController::class, 'playersRanking'])->middleware('role:admin');
         Route::get('players/ranking/worst', [UserController::class, 'worstPlayer'])->middleware('role:admin|player');
         Route::get('players/ranking/best', [UserController::class, 'bestPlayer'])->middleware('role:admin|player');
