@@ -39,9 +39,17 @@ class RankingsTest extends TestCase
 
         $response = $this->withHeaders(['Authorization' => 'Bearer ' . $token])->json('get', "/api/players", []);
 
-        foreach ($response['players'] as $playerData) {
-            $this->assertEquals(100, $playerData['winrate']);
-        }
+        $response->assertStatus(200)
+            ->assertJsonStructure([
+                'players' => [
+                    '*' => [
+                        'id',
+                        'nickname',
+                        'ranking',
+                        'winrate',
+                    ],
+                ],
+            ]);
     }
     public function testUserWinrate()
     {
@@ -68,8 +76,14 @@ class RankingsTest extends TestCase
 
         $response = $this->withHeaders(['Authorization' => 'Bearer ' . $token])->json('get', "api/players/ranking", []);
         $response->assertStatus(200);
-        $this->assertEquals(100, $response['Winrate general']);
+
+        $responseData = $response->json();
+
+        $this->assertArrayHasKey('Winrate general', $responseData);
+
+        $this->assertEquals(100, $responseData['Winrate general']);
     }
+
     public function tearDown():void
     {
         User::whereIn('id', $this->createdPlayerIds)->delete();

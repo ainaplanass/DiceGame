@@ -7,7 +7,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
-
+use App\Models\Game;
 
 class User extends Authenticatable
 {
@@ -50,5 +50,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(Game::class, 'user_id');
     }
+    public function calculateSuccessRate(){
+        $playedGames = $this->games()->count();
+        $winGames = $this->games()->where('result', 7)->count();
 
+        return $playedGames > 0 ? ($winGames / $playedGames) * 100 : 0;
+}
 }

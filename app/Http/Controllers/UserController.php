@@ -96,29 +96,32 @@ class UserController extends Controller
     }
     public function playersWinrate()
    {
-      $players = User::all();
+    $users = User::all();
 
-      if ($players->isEmpty()) {
-        return response()->json(['message' => 'No hi ha jugadors'], 404);
-    }
-      $playersWithWinrate = $players->map(function ($player) {
-          $totalGames = $player->games->count();
-          $totalWins = $player->games->where('result', 7)->count();
+    $users->each(function ($user) {
+        $user->ranking = $user->calculateSuccessRate();
+    });
 
-          if ($totalGames > 0) {
-              $winRate = ($totalWins / $totalGames) * 100;
-          } else {
-              $winRate = 0;
-          }
+    $users = $users->sortByDesc('ranking')->sortByDesc(function ($user) {
+        return $user->calculateSuccessRate();
+    });
 
-          return [
-              'nickname' => $player->nickname,
-              'winrate' => $winRate,
-          ];
-      });
+    $users->values()->each(function ($user, $index) {
+        $user->ranking = $index + 1;
+    });
 
-    return response()->json(['players' => $playersWithWinrate], 200);
-   }
+    $response = $users->map(function ($user) {
+        return [
+            'id' => $user->id,
+            'nickname' => $user->nickname,
+            'ranking' => $user->ranking,
+            'winrate' => $user->calculateSuccessRate(),
+        ];
+    });
+
+    return response()->json(['players' => $response], 200);
+}
+
     public function playersList($id)
     {
       $player = User::find($id);

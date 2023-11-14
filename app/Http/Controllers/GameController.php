@@ -38,7 +38,12 @@ class GameController extends Controller
 
         $game->save();
 
-        return response()->json(['message' => 'Daus: ' . $dice1.' + '.$dice2. ' Resultat: ' . $total ], 201);
+        return response()->json([
+            'dice1' => $dice1,
+            'dice2' => $dice2,
+            'total' => $total,
+            'message' => 'Jugada realitzada amb èxit.'
+        ], 201);
     }
     public function deleteGame($id)
     {
