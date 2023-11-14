@@ -45,8 +45,6 @@ class RankingsTest extends TestCase
                     '*' => [
                         'id',
                         'nickname',
-                        'ranking',
-                        'winrate',
                     ],
                 ],
             ]);

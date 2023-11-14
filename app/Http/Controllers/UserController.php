@@ -94,28 +94,15 @@ class UserController extends Controller
 
       return response()->json(['message' => 'Nom del jugador editat'], 200);
     }
-    public function playersWinrate()
+    public function players()
    {
     $users = User::all();
 
-    $users->each(function ($user) {
-        $user->ranking = $user->calculateSuccessRate();
-    });
-
-    $users = $users->sortByDesc('ranking')->sortByDesc(function ($user) {
-        return $user->calculateSuccessRate();
-    });
-
-    $users->values()->each(function ($user, $index) {
-        $user->ranking = $index + 1;
-    });
 
     $response = $users->map(function ($user) {
         return [
             'id' => $user->id,
             'nickname' => $user->nickname,
-            'ranking' => $user->ranking,
-            'winrate' => $user->calculateSuccessRate(),
         ];
     });
 
